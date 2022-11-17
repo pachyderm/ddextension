@@ -1,0 +1,19 @@
+{
+  "icon": "docker.svg",
+  "vm": {
+    "composefile": "docker-compose.yaml",
+    "exposes": {
+      "socket": "extension-Pachyderm.sock"
+    }
+  },
+  "ui": {
+    "dashboard-tab": {
+      "title": "Pach Extension",
+      "src": "index.html",
+      "root": "ui",
+      "backend": {
+        "socket": "extension-Pachyderm.sock"
+      }
+    }
+  }
+}
