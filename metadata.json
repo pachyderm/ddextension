@@ -1,19 +1,48 @@
 {
   "icon": "docker.svg",
-  "vm": {
-    "composefile": "docker-compose.yaml",
-    "exposes": {
-      "socket": "extension-Pachyderm.sock"
-    }
-  },
   "ui": {
     "dashboard-tab": {
       "title": "Pach Extension",
       "src": "index.html",
-      "root": "ui",
-      "backend": {
-        "socket": "extension-Pachyderm.sock"
-      }
+      "root": "ui"
     }
+  },
+  "host": {
+    "binaries": [
+      {
+        "linux": [
+          {
+            "path": "/linux/kubectl"
+          }
+        ],
+        "darwin": [
+          {
+            "path": "/darwin/kubectl"
+          }
+        ],
+        "windows": [
+          {
+            "path": "/windows/kubectl.exe"
+          }
+        ]
+      },
+      {
+        "linux": [
+          {
+            "path": "/linux/helm"
+          }
+        ],
+        "darwin": [
+          {
+            "path": "/darwin/helm"
+          }
+        ],
+        "windows": [
+          {
+            "path": "/windows/helm.exe"
+          }
+        ]
+      }
+    ]
   }
 }

@@ -1,23 +1,15 @@
-FROM golang:1.19-alpine AS builder
-ENV CGO_ENABLED=0
-WORKDIR /backend
-COPY vm/go.* .
-RUN --mount=type=cache,target=/go/pkg/mod \
-    --mount=type=cache,target=/root/.cache/go-build \
-    go mod download
-COPY vm/. .
-RUN --mount=type=cache,target=/go/pkg/mod \
-    --mount=type=cache,target=/root/.cache/go-build \
-    go build -trimpath -ldflags="-s -w" -o bin/service
-
 FROM --platform=$BUILDPLATFORM node:18.9-alpine3.15 AS client-builder
+
 WORKDIR /ui
+
 # cache packages in layer
 COPY ui/package.json /ui/package.json
 COPY ui/package-lock.json /ui/package-lock.json
+
 RUN --mount=type=cache,target=/usr/src/app/.npm \
     npm set cache /usr/src/app/.npm && \
     npm ci
+
 # install
 COPY ui /ui
 RUN npm run build
@@ -33,9 +25,33 @@ LABEL org.opencontainers.image.title="Pach extension" \
     com.docker.extension.additional-urls="" \
     com.docker.extension.changelog=""
 
-COPY --from=builder /backend/bin/service /
-COPY docker-compose.yaml .
+RUN apk add curl
+RUN curl -L -o helm-linux-amd64.tar.gz https://get.helm.sh/helm-v3.10.2-linux-amd64.tar.gz \
+    && mkdir /linux \
+    && tar -zxvf helm-linux-amd64.tar.gz \
+    && chmod +x linux-amd64/helm && mv linux-amd64/helm /linux
+
+RUN curl -L -o helm-darwin-amd64.tar.gz https://get.helm.sh/helm-v3.10.2-darwin-amd64.tar.gz \
+    && mkdir /darwin \
+    && tar -zxvf helm-darwin-amd64.tar.gz \
+    && chmod +x darwin-amd64/helm && mv darwin-amd64/helm /darwin
+
+RUN curl -L -o helm-windows-amd64.tar.gz https://get.helm.sh/helm-v3.10.2-windows-amd64.tar.gz \
+    && mkdir /windows \
+    && tar -zxvf helm-windows-amd64.tar.gz \
+    && chmod +x windows-amd64/helm.exe && mv windows-amd64/helm.exe /windows
+
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
+    && chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl \
+    && cp /usr/local/bin/kubectl /linux/
+
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/darwin/amd64/kubectl" \
+    && chmod +x ./kubectl && mv ./kubectl /darwin/
+
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/windows/amd64/kubectl.exe" \
+    && chmod +x ./kubectl.exe && mv ./kubectl.exe /windows/
+
 COPY metadata.json .
 COPY docker.svg .
 COPY --from=client-builder /ui/build ui
-CMD /service -socket /run/guest-services/extension-Pachyderm.sock
+
