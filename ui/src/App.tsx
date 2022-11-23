@@ -2,14 +2,7 @@ import React from "react";
 import Button from "@mui/material/Button";
 import { createDockerDesktopClient } from "@docker/extension-api-client";
 import { Grid, Stack, TextField, Typography } from "@mui/material";
-import {
-  checkK8sConnection,
-  getCurrentHostContext,
-  listHostContexts,
-  listNamespaces,
-  setDockerDesktopContext,
-  updatePach,
-} from "./helper/kubernetes";
+import { updatePach } from "./helper/kubernetes";
 
 // Note: This line relies on Docker Desktop's presence as a host application.
 // If you're running this React app in a browser, it won't work properly.
@@ -35,53 +28,11 @@ export function App() {
             <Button
               variant="contained"
               onClick={async () => {
-                const result = await checkK8sConnection(ddClient);
-                setResponse(result);
-              }}
-            >
-              Check prerequisites
-            </Button>
-
-            <Button
-              variant="contained"
-              onClick={async () => {
-                //const ctxResult = await setDockerDesktopContext(ddClient);
-                //setResponse(ctxResult);
                 const pachResult = await updatePach(ddClient);
                 setResponse(pachResult);
               }}
             >
               Install Pachyderm
-            </Button>
-
-            <Button
-              variant="contained"
-              onClick={async () => {
-                const result = await getCurrentHostContext(ddClient);
-                setResponse(result);
-              }}
-            >
-              Get current host context
-            </Button>
-
-            <Button
-              variant="contained"
-              onClick={async () => {
-                const result = await listHostContexts(ddClient);
-                setResponse(result);
-              }}
-            >
-              List contexts
-            </Button>
-
-            <Button
-              variant="contained"
-              onClick={async () => {
-                const result = await listNamespaces(ddClient);
-                setResponse(result as string);
-              }}
-            >
-              List namespaces
             </Button>
           </Stack>
         </Grid>
