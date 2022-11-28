@@ -66,11 +66,24 @@ export const updatePach = async (
             "--set",
             "proxy.enabled=true",
             "--set proxy.service.type=LoadBalancer",
+            "--set pachd.clusterDeploymentID=my-personal-pachyderm-deployment",
         ]);
     } catch (e: any) {
         console.error(e);
         return e?.stderr;
     }
     console.log("Pachyderm installed\n");
+    try {
+        let out = await ddClient.extension.host?.cli.exec("pachctl", [
+            "config",
+            "set",
+            "active-context",
+            "local",
+        ]);
+    } catch (e: any) {
+        console.error(e);
+        return e?.stderr;
+    }
+    console.log("Pachyderm context set to local\n");
     return result;
 };

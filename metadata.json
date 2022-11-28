@@ -29,6 +29,18 @@
       {
         "linux": [
           {
+            "path": "/linux/pachctl"
+          }
+        ],
+        "darwin": [
+          {
+            "path": "/darwin/pachctl"
+          }
+        ]
+      },
+      {
+        "linux": [
+          {
             "path": "/linux/helm"
           }
         ],

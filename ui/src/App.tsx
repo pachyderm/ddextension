@@ -28,6 +28,7 @@ export function App() {
             <Button
               variant="contained"
               onClick={async () => {
+                setResponse("");
                 const pachResult = await updatePach(ddClient);
                 setResponse(pachResult);
               }}

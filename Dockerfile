@@ -51,6 +51,17 @@ RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/s
 RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/windows/amd64/kubectl.exe" \
     && chmod +x ./kubectl.exe && mv ./kubectl.exe /windows/
 
+RUN apk add unzip
+RUN curl -LO https://github.com/pachyderm/pachyderm/releases/download/v2.4.0/pachctl_2.4.0_darwin_amd64.zip \
+    && unzip pachctl_2.4.0_darwin_amd64.zip \
+    && chmod +x pachctl_2.4.0_darwin_amd64/pachctl \
+    && mv pachctl_2.4.0_darwin_amd64/pachctl /darwin/
+
+RUN curl -LO https://github.com/pachyderm/pachyderm/releases/download/v2.4.0/pachctl_2.4.0_linux_amd64.tar.gz \
+    && tar -zxvf pachctl_2.4.0_linux_amd64.tar.gz \
+    && chmod +x pachctl_2.4.0_linux_amd64/pachctl \
+    && mv pachctl_2.4.0_linux_amd64/pachctl /linux/
+
 COPY metadata.json .
 COPY docker.svg .
 COPY --from=client-builder /ui/build ui
