@@ -39,10 +39,10 @@ RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/s
     && mkdir /windows \
     && chmod +x ./kubectl.exe && mv ./kubectl.exe /windows/
 
-COPY --chmod=0755 script/install-darwin.sh /darwin/install
-COPY --chmod=0755 script/install-linux.sh /linux/install
+COPY --chmod=0755 script/install.sh /darwin/install
+COPY --chmod=0755 script/install.sh /linux/install
 COPY --chmod=0755 script/install-windows.ps1 /windows/install
-COPY --chmod=0755 script/install-linux.sh /windows/iinstall-linux.sh
+COPY --chmod=0755 script/install.sh /windows/install-linux.sh
 
 
 
