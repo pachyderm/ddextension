@@ -28,7 +28,7 @@ export function App() {
             <Button
               variant="contained"
               onClick={async () => {
-                setResponse("");
+                setResponse("installing... waiting for the URL");
                 const pachResult = await updatePach(ddClient);
                 setResponse(pachResult);
               }}
