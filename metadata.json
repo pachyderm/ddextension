@@ -29,29 +29,17 @@
       {
         "linux": [
           {
-            "path": "/linux/pachctl"
+            "path": "/linux/install"
           }
         ],
         "darwin": [
           {
-            "path": "/darwin/pachctl"
-          }
-        ]
-      },
-      {
-        "linux": [
-          {
-            "path": "/linux/helm"
-          }
-        ],
-        "darwin": [
-          {
-            "path": "/darwin/helm"
+            "path": "/darwin/install"
           }
         ],
         "windows": [
           {
-            "path": "/windows/helm.exe"
+            "path": "/windows/install"
           }
         ]
       }
