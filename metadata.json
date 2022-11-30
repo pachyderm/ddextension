@@ -29,6 +29,23 @@
       {
         "linux": [
           {
+            "path": "/linux/helm"
+          }
+        ],
+        "darwin": [
+          {
+            "path": "/darwin/helm"
+          }
+        ],
+        "windows": [
+          {
+            "path": "/windows/helm.exe"
+          }
+        ]
+      },
+      {
+        "linux": [
+          {
             "path": "/linux/install"
           }
         ],

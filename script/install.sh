@@ -24,18 +24,18 @@ else
     echo "installed"
 fi
 
-echo -n "Helm..."
-if [[ $(command -v helm) == "" ]] ; then
-    echo "installing"
-    brew install helm
-    brew link --overwrite helm 2>&1-
-    if [[ $(command -v helm) == "" ]] ; then
-        echo "failed"
-        abort "Helm not installed. Try installing \`helm\` manually"
-    fi
-else
-    echo "installed"
-fi
+# echo -n "Helm..."
+# if [[ $(command -v helm) == "" ]] ; then
+#     echo "installing"
+#     brew install helm
+#     brew link --overwrite helm 2>&1-
+#     if [[ $(command -v helm) == "" ]] ; then
+#         echo "failed"
+#         abort "Helm not installed. Try installing \`helm\` manually"
+#     fi
+# else
+#     echo "installed"
+# fi
 
 echo -n "Pachctl..."
 if [[ $(command -v pachctl) == "" ]] ; then
@@ -52,13 +52,13 @@ if [[ $(command -v pachctl) == "" ]] ; then
     abort "Pachctl not installed. Try installing \`pachctl\` manually"
 fi
 
-echo -n "Pachyderm..."
-helm uninstall pachd 2>&1-
-sleep 5
-helm repo add pach https://helm.pachyderm.com 2>&1-
-helm repo update pach 2>&1-
-helm install pachd pach/pachyderm --set deployTarget=LOCAL --set proxy.enabled=true --set proxy.service.type=LoadBalancer --set pachd.clusterDeploymentID=my-personal-pachyderm-deployment 2>&1-
-echo "deployed"
+# echo -n "Pachyderm..."
+# helm uninstall pachd 2>&1-
+# sleep 5
+# helm repo add pach https://helm.pachyderm.com 2>&1-
+# helm repo update pach 2>&1-
+# helm install pachd pach/pachyderm --set deployTarget=LOCAL --set proxy.enabled=true --set proxy.service.type=LoadBalancer --set pachd.clusterDeploymentID=my-personal-pachyderm-deployment 2>&1-
+# echo "deployed"
 
 pachctl config set active-context local
 

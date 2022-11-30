@@ -40,6 +40,18 @@ RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/s
     && mkdir /windows \
     && chmod +x ./kubectl.exe && mv ./kubectl.exe /windows/
 
+RUN curl -L -o helm-linux-amd64.tar.gz https://get.helm.sh/helm-v3.10.2-linux-amd64.tar.gz \
+    && tar -zxvf helm-linux-amd64.tar.gz \
+    && chmod +x linux-amd64/helm && mv linux-amd64/helm /linux
+
+RUN curl -L -o helm-darwin-amd64.tar.gz https://get.helm.sh/helm-v3.10.2-darwin-amd64.tar.gz \
+    && tar -zxvf helm-darwin-amd64.tar.gz \
+    && chmod +x darwin-amd64/helm && mv darwin-amd64/helm /darwin
+
+RUN curl -L -o helm-windows-amd64.tar.gz https://get.helm.sh/helm-v3.10.2-windows-amd64.tar.gz \
+    && tar -zxvf helm-windows-amd64.tar.gz \
+    && chmod +x windows-amd64/helm.exe && mv windows-amd64/helm.exe /windows
+
 COPY --chmod=0755 script/install.sh /darwin/install
 COPY --chmod=0755 script/install.sh /linux/install
 COPY --chmod=0755 script/install-windows.ps1 /windows/install
