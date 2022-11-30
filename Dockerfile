@@ -12,6 +12,7 @@ RUN --mount=type=cache,target=/usr/src/app/.npm \
 
 # install
 COPY ui /ui
+RUN npx update-browserslist-db@latest
 RUN npm run build
 
 FROM alpine
@@ -44,9 +45,6 @@ COPY --chmod=0755 script/install.sh /linux/install
 COPY --chmod=0755 script/install-windows.ps1 /windows/install
 COPY --chmod=0755 script/install.sh /windows/install-linux.sh
 
-
-
 COPY metadata.json .
 COPY docker.svg .
 COPY --from=client-builder /ui/build ui
-
