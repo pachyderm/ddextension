@@ -19,6 +19,7 @@ export const updatePach = async (
         console.log("Kubernetes not enabled");
         return "Go to Settings -> Kubernetes -> Enable";
     }
+    result = result.concat("[check] kubernetes...enabled\n");
     console.log("Kubernetes enabled\n");
     try {
         let out = await ddClient.extension.host?.cli.exec("helm", [
@@ -31,6 +32,7 @@ export const updatePach = async (
             return e?.stderr;
         }
     }
+    result = result.concat("[uninstall] pachyderm...done\n");
     console.log("Pach install clean\n");
     try {
         let out = await ddClient.extension.host?.cli.exec("helm", [
@@ -45,6 +47,7 @@ export const updatePach = async (
             return e?.stderr;
         }
     }
+    result = result.concat("[add] pachyderm helm repo...done\n");
     console.log("Helm add repo (pach)\n");
     try {
         let out = await ddClient.extension.host?.cli.exec("helm", [
@@ -56,6 +59,7 @@ export const updatePach = async (
         console.error(e);
         return e?.stderr;
     }
+    result = result.concat("[update] pachyderm helm repo...done\n");
     console.log("Helm update repo (pach)\n");
     try {
         let out = await ddClient.extension.host?.cli.exec("helm", [
@@ -73,6 +77,7 @@ export const updatePach = async (
         console.error(e);
         return e?.stderr;
     }
+    result = result.concat("[install] pachyderm local deployment...done\n");
     console.log("Pachyderm installed\n");
     try {
         let output = await ddClient.extension.host?.cli.exec("install", [
@@ -82,6 +87,7 @@ export const updatePach = async (
         console.error(e);
         return e?.stderr;
     }
+    result = result.concat("[install] pachctl...done\n");
     console.log("Pachctl installed and context set to local\n");
     console.log(result);
     return result;
