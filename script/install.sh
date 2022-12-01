@@ -7,39 +7,88 @@ abort() {
   exit 1
 }
 
-if [ -z "${BASH_VERSION:-}" ]
-then
-   abort "Bash is required to interpret this script."
-fi
-
-echo -n "Brew..."
-if [[ $(command -v brew) == "" ]] ; then
-    echo "installing"
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    if [[ $(command -v brew) == "" ]] ; then
-        echo "failed."
-        abort "Brew not installed. Try installing \`brew\` manually"
+copyPachctl() {
+    ARCH="$(uname -m)"
+    MACH="$(uname)"
+    URL=""
+    if [ "$ARCH" == "x86_64" ] || [ "$ARCH" == "X86_64" ]; then
+        ARCH=amd64
+    elif [ "$ARCH" == "arm"* ] || [ "$ARCH" == "Arm"* ]; then
+        ARCH=arm64
     fi
-else
+    if [ "$MACH" == "Darwin" ] || [ "$MACH" == "darwin" ]; then
+        URL=https://github.com/pachyderm/pachyderm/releases/download/v2.4.1/pachctl_2.4.1_darwin_$ARCH.zip
+        curl -Ls -o pachctl.zip $URL 2>&1-
+        unzip pachctl.zip 2>&1-
+        chmod +x pachctl_2.4.1_darwin_$ARCH/pachctl
+        cp pachctl_2.4.1_darwin_$ARCH/pachctl $1
+        rm -rf pachctl_2.4.1_darwin_$ARCH pachctl.zip
+    elif [ "$MACH" == "Linux" ] || [ "$MACH" == "linux" ]; then
+        URL=https://github.com/pachyderm/pachyderm/releases/download/v2.4.1/pachctl_2.4.1_linux_$ARCH.tar.gz
+        curl -Ls -o pachctl.tar.gz $URL
+        tar -zxf pachctl.tar.gz
+        chmod +x pachctl_2.4.1_linux_$ARCH/pachctl
+        cp pachctl_2.4.1_linux_$ARCH/pachctl $1
+        rm -rf pachctl_2.4.1_linux_$ARCH pachctl.tar.gz
+    else
+        abort "Cannot find $MACH for $ARCH"
+    fi
     echo "installed"
-fi
+}
 
-echo -n "Pachctl..."
-if [[ $(command -v pachctl) == "" ]] ; then
-    echo "installing"
-    brew install pachctl@2.4 2>-
-else
-    brew upgrade pachctl@2.4 2>-
-    brew unlink pachctl@2.4 2>&1-
-    brew link pachctl@2.4 2>&1-
-    echo "upgraded"
-fi
+forceInstallPachctl() {
+    PACHCTL_INSTALL_PATH="$(command -v pachctl)"
+    if [[ -z "$PACHCTL_INSTALL_PATH" ]]; then
+        if [[ "$(touch /usr/local/bin/pachctl)" ]]; then
+            IFS=: read -r -d '' -a path_array < <(printf '%s:\0' "$PATH")
+            set -o noglob
+            for p in "${path_array[@]}"; do
+                P_PATH="$p/pachctl"
+                if [[ -z "$(touch "$P_PATH")" ]]; then
+                    PACHCTL_INSTALL_PATH="$P_PATH"
+                    break
+                fi
+            done
+        else
+            PACHCTL_INSTALL_PATH="/usr/local/bin/pachctl"
+        fi
+        rm -f "$PACHCTL_INSTALL_PATH"
+    fi
+    copyPachctl $PACHCTL_INSTALL_PATH
+    if [[ $(command -v pachctl) == "" ]] ; then
+        abort "Pachctl not installed. Try installing \`pachctl\` manually"
+    fi
+}
 
-if [[ $(command -v pachctl) == "" ]] ; then
-    abort "Pachctl not installed. Try installing \`pachctl\` manually"
-fi
+installPachctl() {
+    echo -n "Pachctl..."
+    if [[ $(command -v brew) == "" ]] ; then
+        forceInstallPachctl
+    else
+        if [[ $(command -v pachctl) == "" ]] ; then
+            brew install pachctl@2.4 2>-
+            echo "installed"
+        else
+            brew upgrade pachctl@2.4 2>-
+            brew unlink pachctl@2.4 2>&1-
+            brew link pachctl@2.4 2>&1-
+            echo "upgraded"
+        fi
+    fi
+}
 
-pachctl config set active-context local
+waitForPachdReady() {
+    pachctl config set active-context local
+    startTime=$(date +%S)
+    while [[ $(pachctl version | grep pachd) != "pachd"* ]] ; do
+       sleep 1
+       currTime=$(date +%S)
+       if [[ $(($currTime-$startTime)) > 600 ]] ; then
+           abort "Abort waiting for pachd for more than 600 seconds"
+       fi
+    done
+    echo "Pachyderm ready!!"
+}
 
-while [[ $(pachctl version | grep pachd) != "pachd"* ]]; do sleep 1; done
-echo "Pachyderm ready!!"
+installPachctl
+waitForPachdReady

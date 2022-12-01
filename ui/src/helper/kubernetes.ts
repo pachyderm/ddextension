@@ -82,7 +82,7 @@ export const updatePach = async (
         console.error(e);
         return e?.stderr;
     }
-    console.log("Pachyderm installed and context set to local\n");
+    console.log("Pachctl installed and context set to local\n");
     console.log(result);
     return result;
 };
