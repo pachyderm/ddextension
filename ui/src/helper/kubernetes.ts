@@ -3,6 +3,7 @@ import { v1 } from "@docker/extension-api-client-types";
 export const DockerDesktop = "docker-desktop";
 export const CurrentExtensionContext = "currentExtensionContext";
 export const IsK8sEnabled = "isK8sEnabled";
+export const pachVersion = "2.4"
 
 export const updatePach = async (
   ddClient: v1.DockerDesktopClient
@@ -66,10 +67,10 @@ export const updatePach = async (
             "install",
             "pachd",
             "pach/pachyderm",
-            "--set",
-            "deployTarget=LOCAL",
-            "--set",
-            "proxy.enabled=true",
+            "--version",
+            pachVersion,
+            "--set deployTarget=LOCAL",
+            "--set proxy.enabled=true",
             "--set proxy.service.type=LoadBalancer",
             "--set pachd.clusterDeploymentID=my-personal-pachyderm-deployment",
         ]);
@@ -82,6 +83,7 @@ export const updatePach = async (
     try {
         let output = await ddClient.extension.host?.cli.exec("install", [
             "/windows/install-linux.sh",
+            pachVersion,
         ]);
     } catch (e: any) {
         console.error(e);

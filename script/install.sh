@@ -1,6 +1,9 @@
 #!/bin/bash
 
 set -u
+PACHCTL_SCR="$1"
+PACHCTL_VER="$2"
+PACHCTL_MAJOR_MINOR=$(echo "$PACHCTL_VER" | cut -f -2 -d ".")
 
 abort() {
   printf "%s\n" "$@" >&2
@@ -17,23 +20,22 @@ copyPachctl() {
         ARCH=arm64
     fi
     if [ "$MACH" == "Darwin" ] || [ "$MACH" == "darwin" ]; then
-        URL=https://github.com/pachyderm/pachyderm/releases/download/v2.4.1/pachctl_2.4.1_darwin_$ARCH.zip
-        curl -Ls -o pachctl.zip $URL 2>&1-
+        URL=https://github.com/pachyderm/pachyderm/releases/download/v$PACHCTL_VER/pachctl_$PACHCTL_VER_$ARCH.zip
+        curl -Ls -o pachctl.zip $URL > /dev/null 2>&1
         unzip pachctl.zip 2>&1-
-        chmod +x pachctl_2.4.1_darwin_$ARCH/pachctl
-        cp pachctl_2.4.1_darwin_$ARCH/pachctl $1
-        rm -rf pachctl_2.4.1_darwin_$ARCH pachctl.zip
+        chmod +x pachctl_$PACHCTL_VER_darwin_$ARCH/pachctl
+        cp pachctl_$PACHCTL_VER_$ARCH/pachctl $1
+        rm -rf pachctl_$PACHCTL_VER_darwin_$ARCH pachctl.zip
     elif [ "$MACH" == "Linux" ] || [ "$MACH" == "linux" ]; then
-        URL=https://github.com/pachyderm/pachyderm/releases/download/v2.4.1/pachctl_2.4.1_linux_$ARCH.tar.gz
-        curl -Ls -o pachctl.tar.gz $URL
+        URL=https://github.com/pachyderm/pachyderm/releases/download/v$PACHCTL_VER/pachctl_$PACHCTL_VER_linux_$ARCH.tar.gz
+        curl -Ls -o pachctl.tar.gz $URL > /dev/null 2>&1
         tar -zxf pachctl.tar.gz
-        chmod +x pachctl_2.4.1_linux_$ARCH/pachctl
-        cp pachctl_2.4.1_linux_$ARCH/pachctl $1
-        rm -rf pachctl_2.4.1_linux_$ARCH pachctl.tar.gz
+        chmod +x pachctl_$PACHCTL_VER_linux_$ARCH/pachctl
+        cp pachctl_$PACHCTL_VER_linux_$ARCH/pachctl $1
+        rm -rf pachctl_$PACHCTL_VER_linux_$ARCH pachctl.tar.gz
     else
         abort "Cannot find $MACH for $ARCH"
     fi
-    echo "installed"
 }
 
 forceInstallPachctl() {
@@ -55,25 +57,26 @@ forceInstallPachctl() {
         rm -f "$PACHCTL_INSTALL_PATH"
     fi
     copyPachctl $PACHCTL_INSTALL_PATH
-    if [[ $(command -v pachctl) == "" ]] ; then
-        abort "Pachctl not installed. Try installing \`pachctl\` manually"
-    fi
 }
 
 installPachctl() {
     echo -n "Pachctl..."
     if [[ $(command -v brew) == "" ]] ; then
         forceInstallPachctl
+        echo "installed"
     else
         if [[ $(command -v pachctl) == "" ]] ; then
-            brew install pachctl@2.4 2>-
+            brew install pachctl@$PACHCTL_MAJOR_MINOR > /dev/null 2>&1
             echo "installed"
         else
-            brew upgrade pachctl@2.4 2>-
-            brew unlink pachctl@2.4 2>&1-
-            brew link pachctl@2.4 2>&1-
+            brew upgrade pachctl@$PACHCTL_MAJOR_MINOR > /dev/null 2>&1
+            brew unlink pachctl@$PACHCTL_MAJOR_MINOR > /dev/null 2>&1
+            brew link pachctl@$PACHCTL_MAJOR_MINOR > /dev/null 2>&1
             echo "upgraded"
         fi
+    fi
+    if [[ $(command -v pachctl) == "" ]] ; then
+        abort "Pachctl not installed. Try installing \`pachctl\` manually"
     fi
 }
 
