@@ -3,7 +3,7 @@
 </p>
 
 # Intro
-Docker desktop is supported on all platfrom -- Linux, Mac, and Windows. It also has the AMD64 and ARM64 version. This enables the ONE click deployment of Pachyderm on personal comuters possible.
+Docker desktop is supported on all platfrom -- Linux, Mac, and Windows. It also has the AMD64 and ARM64 version. This enables the ONE click deployment of Pachyderm on personal comuters.
 
 Ideal state of our getting started doc.
 ## Mac/Linux
@@ -20,11 +20,13 @@ Happy Paching!!!
 - type `pachctl version` on your terminal
 
 # Current state
-- Works on Intel Mac
-- [TODO] Need to add linux/arm64 in Makefile to build arm support (takes too long to build)
+- Works on amd64 Mac
+- [TODO] Need to add linux/arm64 in Makefile to build arm support (takes too long to build) (Update to use buildx and specify --platform)
+- [TODO] Need to test amd64 Linux should also be similar amd64 Mac
 - [TODO] Need to test on Windows - it is mostly figuring out how to install pachctl on Windows (rest should work)
 - [TODO] Testing story is still open
 - [TODO] Lots of UI improvements -- eg. change from Install to Upgrade (if extension is already installed)
+- [TODO] Need a way to know the latest pach release -- right now there is no easy way to know the latest stable/ga release. k8s checks in a stable.txt in their repo, which can be pulled by anyone. Good way to keep the community to the latest release.
 
 # How to install extension?
 - Install Docker Desktop on your machine
