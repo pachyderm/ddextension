@@ -64,5 +64,5 @@ COPY --chmod=0755 script/install-windows.ps1 /windows/install
 COPY --chmod=0755 script/install.sh /windows/install-linux.sh
 
 COPY metadata.json .
-COPY docker.svg .
+COPY pachydermLogoFooter.svg .
 COPY --from=client-builder /ui/build ui

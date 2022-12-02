@@ -1,8 +1,8 @@
 {
-  "icon": "docker.svg",
+  "icon": "pachydermLogoFooter.svg",
   "ui": {
     "dashboard-tab": {
-      "title": "Pachyderm Extension",
+      "title": "Pachyderm",
       "src": "index.html",
       "root": "ui"
     }
