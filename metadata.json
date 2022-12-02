@@ -2,7 +2,7 @@
   "icon": "docker.svg",
   "ui": {
     "dashboard-tab": {
-      "title": "Pach Extension",
+      "title": "Pachyderm Extension",
       "src": "index.html",
       "root": "ui"
     }

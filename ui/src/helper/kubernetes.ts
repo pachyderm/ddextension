@@ -3,7 +3,7 @@ import { v1 } from "@docker/extension-api-client-types";
 export const DockerDesktop = "docker-desktop";
 export const CurrentExtensionContext = "currentExtensionContext";
 export const IsK8sEnabled = "isK8sEnabled";
-export const pachVersion = "2.4"
+export const pachVersion = "2.4.1"
 
 export const updatePach = async (
   ddClient: v1.DockerDesktopClient

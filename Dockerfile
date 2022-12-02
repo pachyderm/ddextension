@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM node:18.9-alpine3.15 AS client-builder
+FROM --platform=$TARGETPLATFORM node:18.9-alpine3.15 AS client-builder
 
 WORKDIR /ui
 
@@ -15,10 +15,12 @@ COPY ui /ui
 RUN npx update-browserslist-db@latest
 RUN npm run build
 
-FROM alpine
-LABEL org.opencontainers.image.title="Pach extension" \
+FROM --platform=$TARGETPLATFORM alpine
+ARG TARGETARCH
+
+LABEL org.opencontainers.image.title="Pachyderm Docker Desktop Extension" \
     org.opencontainers.image.description="One click Pachyderm install" \
-    org.opencontainers.image.vendor="Nitin" \
+    org.opencontainers.image.vendor="Pachyderm" \
     com.docker.desktop.extension.api.version=">= 0.3.0" \
     com.docker.extension.screenshots="" \
     com.docker.extension.detailed-description="" \
@@ -27,30 +29,34 @@ LABEL org.opencontainers.image.title="Pach extension" \
     com.docker.extension.changelog=""
 
 RUN apk add curl
-RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/${TARGETARCH}/kubectl \
     && mkdir /linux \
     && chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl \
     && cp /usr/local/bin/kubectl /linux/
 
-RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/darwin/amd64/kubectl" \
+RUN curl -L -o helm-linux-${TARGETARCH}.tar.gz https://get.helm.sh/helm-v3.10.2-linux-${TARGETARCH}.tar.gz \
+    && tar -zxvf helm-linux-${TARGETARCH}.tar.gz \
+    && chmod +x linux-${TARGETARCH}/helm && mv linux-${TARGETARCH}/helm /linux
+
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/darwin/${TARGETARCH}/kubectl" \
     && mkdir /darwin \
     && chmod +x ./kubectl && mv ./kubectl /darwin/
 
-RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/windows/amd64/kubectl.exe" \
-    && mkdir /windows \
-    && chmod +x ./kubectl.exe && mv ./kubectl.exe /windows/
+RUN curl -L -o helm-darwin-${TARGETARCH}.tar.gz https://get.helm.sh/helm-v3.10.2-darwin-${TARGETARCH}.tar.gz \
+    && tar -zxvf helm-darwin-${TARGETARCH}.tar.gz \
+    && chmod +x darwin-${TARGETARCH}/helm && mv darwin-${TARGETARCH}/helm /darwin
 
-RUN curl -L -o helm-linux-amd64.tar.gz https://get.helm.sh/helm-v3.10.2-linux-amd64.tar.gz \
-    && tar -zxvf helm-linux-amd64.tar.gz \
-    && chmod +x linux-amd64/helm && mv linux-amd64/helm /linux
+RUN if [ "${TARGETARCH}" = "amd64" ]; then \
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/windows/${TARGETARCH}/kubectl.exe" \
+        && mkdir /windows \
+        && chmod +x ./kubectl.exe && mv ./kubectl.exe /windows/; \
+    fi
 
-RUN curl -L -o helm-darwin-amd64.tar.gz https://get.helm.sh/helm-v3.10.2-darwin-amd64.tar.gz \
-    && tar -zxvf helm-darwin-amd64.tar.gz \
-    && chmod +x darwin-amd64/helm && mv darwin-amd64/helm /darwin
-
-RUN curl -L -o helm-windows-amd64.tar.gz https://get.helm.sh/helm-v3.10.2-windows-amd64.tar.gz \
-    && tar -zxvf helm-windows-amd64.tar.gz \
-    && chmod +x windows-amd64/helm.exe && mv windows-amd64/helm.exe /windows
+RUN if [ "${TARGETARCH}" = "amd64" ]; then \
+        curl -L -o helm-windows-${TARGETARCH}.tar.gz https://get.helm.sh/helm-v3.10.2-windows-${TARGETARCH}.tar.gz \
+        && tar -zxvf helm-windows-${TARGETARCH}.tar.gz \
+        && chmod +x windows-${TARGETARCH}/helm.exe && mv windows-${TARGETARCH}/helm.exe /windows; \
+    fi
 
 COPY --chmod=0755 script/install.sh /darwin/install
 COPY --chmod=0755 script/install.sh /linux/install

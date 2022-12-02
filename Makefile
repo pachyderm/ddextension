@@ -1,4 +1,4 @@
-IMAGE?=nitinjainsj/my-pach
+IMAGE?=pachyderm/ddextension
 TAG?=latest
 
 BUILDER=buildx-multi-arch
