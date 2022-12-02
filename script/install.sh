@@ -1,8 +1,7 @@
 #!/bin/bash
 
 set -u
-PACHCTL_SCR="$1"
-PACHCTL_VER="$2"
+PACHCTL_VER="$1"
 PACHCTL_MAJOR_MINOR=$(echo "${PACHCTL_VER}" | cut -f -2 -d ".")
 
 abort() {

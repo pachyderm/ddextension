@@ -8,10 +8,18 @@ export const pachVersion = "2.4.1"
 export const updatePach = async (
   ddClient: v1.DockerDesktopClient
 ) => {
+    let installScript = "install.sh";
+    let helmbin = "helm";
+    let kcbin = "kubectl";
     var result = new String("Go to http://localhost\n\n");
     result = result.concat("Operations logs...\n");
+    if (ddClient.host.platform === "win32") {
+        installScript = "install.ps1";
+        helmbin = "helm.exe";
+        kcbin = "kubectl.exe";
+    }
     try {
-        let output = await ddClient.extension.host?.cli.exec("kubectl", [
+        let output = await ddClient.extension.host?.cli.exec(kcbin, [
             "cluster-info",
             "--request-timeout",
             "2s",
@@ -23,7 +31,7 @@ export const updatePach = async (
     result = result.concat("[check] kubernetes...enabled\n");
     console.log("Kubernetes enabled\n");
     try {
-        let out = await ddClient.extension.host?.cli.exec("helm", [
+        let out = await ddClient.extension.host?.cli.exec(helmbin, [
             "uninstall",
             "pachd",
         ]);
@@ -36,7 +44,7 @@ export const updatePach = async (
     result = result.concat("[uninstall] pachyderm...done\n");
     console.log("Pach install clean\n");
     try {
-        let out = await ddClient.extension.host?.cli.exec("helm", [
+        let out = await ddClient.extension.host?.cli.exec(helmbin, [
             "repo",
             "add",
             "pach",
@@ -51,7 +59,7 @@ export const updatePach = async (
     result = result.concat("[add] pachyderm helm repo...done\n");
     console.log("Helm add repo (pach)\n");
     try {
-        let out = await ddClient.extension.host?.cli.exec("helm", [
+        let out = await ddClient.extension.host?.cli.exec(helmbin, [
             "repo",
             "update",
             "pach",
@@ -63,7 +71,7 @@ export const updatePach = async (
     result = result.concat("[update] pachyderm helm repo...done\n");
     console.log("Helm update repo (pach)\n");
     try {
-        let out = await ddClient.extension.host?.cli.exec("helm", [
+        let out = await ddClient.extension.host?.cli.exec(helmbin, [
             "install",
             "pachd",
             "pach/pachyderm",
@@ -81,8 +89,7 @@ export const updatePach = async (
     result = result.concat("[install] pachyderm local deployment...done\n");
     console.log("Pachyderm installed\n");
     try {
-        let output = await ddClient.extension.host?.cli.exec("install", [
-            "/windows/install-linux.sh",
+        let output = await ddClient.extension.host?.cli.exec(installScript, [
             pachVersion,
         ]);
     } catch (e: any) {

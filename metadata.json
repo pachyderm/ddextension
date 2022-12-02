@@ -46,17 +46,17 @@
       {
         "linux": [
           {
-            "path": "/linux/install"
+            "path": "/linux/install.sh"
           }
         ],
         "darwin": [
           {
-            "path": "/darwin/install"
+            "path": "/darwin/install.sh"
           }
         ],
         "windows": [
           {
-            "path": "/windows/install"
+            "path": "/windows/install.ps1"
           }
         ]
       }

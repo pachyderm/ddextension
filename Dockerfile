@@ -58,10 +58,9 @@ RUN if [ "${TARGETARCH}" = "amd64" ]; then \
         && chmod +x windows-${TARGETARCH}/helm.exe && mv windows-${TARGETARCH}/helm.exe /windows; \
     fi
 
-COPY --chmod=0755 script/install.sh /darwin/install
-COPY --chmod=0755 script/install.sh /linux/install
-COPY --chmod=0755 script/install-windows.ps1 /windows/install
-COPY --chmod=0755 script/install.sh /windows/install-linux.sh
+COPY --chmod=0755 script/install.sh /darwin/install.sh
+COPY --chmod=0755 script/install.sh /linux/install.sh
+COPY --chmod=0755 script/install-windows.ps1 /windows/install.ps1
 
 COPY metadata.json .
 COPY pachydermLogoFooter.svg .
