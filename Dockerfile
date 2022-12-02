@@ -18,7 +18,7 @@ RUN npm run build
 FROM --platform=$TARGETPLATFORM alpine
 ARG TARGETARCH
 
-LABEL org.opencontainers.image.title="Pachyderm Docker Desktop Extension" \
+LABEL org.opencontainers.image.title="Pachyderm Docker Desktop Installer" \
     org.opencontainers.image.description="One click Pachyderm install" \
     org.opencontainers.image.vendor="Pachyderm" \
     com.docker.desktop.extension.api.version=">= 0.3.0" \
@@ -26,7 +26,8 @@ LABEL org.opencontainers.image.title="Pachyderm Docker Desktop Extension" \
     com.docker.extension.detailed-description="" \
     com.docker.extension.publisher-url="" \
     com.docker.extension.additional-urls="" \
-    com.docker.extension.changelog=""
+    com.docker.extension.changelog="" \
+    com.docker.desktop.extension.icon=pachydermLogoFooter.svg
 
 RUN apk add curl
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/${TARGETARCH}/kubectl \
