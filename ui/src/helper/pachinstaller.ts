@@ -3,18 +3,18 @@ import { v1 } from "@docker/extension-api-client-types";
 export const DockerDesktop = "docker-desktop";
 export const CurrentExtensionContext = "currentExtensionContext";
 export const IsK8sEnabled = "isK8sEnabled";
-export const pachVersion = "2.4.1"
+export const pachVersion = "2.4.1";
 
 export const updatePach = async (
   ddClient: v1.DockerDesktopClient
 ) => {
-    let installScript = "install.sh";
+    let run = "run.sh";
     let helmbin = "helm";
     let kcbin = "kubectl";
     var result = new String("Go to http://localhost\n\n");
     result = result.concat("Operations logs...\n");
     if (ddClient.host.platform === "win32") {
-        installScript = "install.ps1";
+        run = "run.ps1";
         helmbin = "helm.exe";
         kcbin = "kubectl.exe";
     }
@@ -89,7 +89,7 @@ export const updatePach = async (
     result = result.concat("[install] pachyderm local deployment...done\n");
     console.log("Pachyderm installed\n");
     try {
-        let output = await ddClient.extension.host?.cli.exec(installScript, [
+        let output = await ddClient.extension.host?.cli.exec(run, [
             pachVersion,
         ]);
     } catch (e: any) {

@@ -68,7 +68,8 @@ installPachctl() {
             brew install pachctl@${PACHCTL_MAJOR_MINOR} > /dev/null 2>&1
             echo "installed"
         else
-            if [[ -L "$(command -v pachctl)" ]]; then
+            if [ -L "$(command -v pachctl)" ] &&
+               [ "${PACHCTL_MAJOR_MINOR}" == "$(pachctl version --client-only | cut -d '.' -f -2)" ]; then
                 brew upgrade pachctl@${PACHCTL_MAJOR_MINOR} > /dev/null 2>&1
             else
                 brew install pachctl@${PACHCTL_MAJOR_MINOR} > /dev/null 2>&1
