@@ -42,7 +42,6 @@ copyPachctl() {
         for p in "${path_array[@]}"; do
             P_PATH="$p/pachctl"
             if [[ "$(cp -f pachctl_dir/pachctl ${P_PATH})" -eq 0 ]]; then
-		echo "COPY file to ${P_PATH}"
                 break
             fi
         done
