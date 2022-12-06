@@ -18,16 +18,15 @@ RUN npm run build
 FROM --platform=$TARGETPLATFORM alpine
 ARG TARGETARCH
 
-LABEL org.opencontainers.image.title="Pachyderm Docker Desktop Installer" \
-    org.opencontainers.image.description="One click Pachyderm install" \
+LABEL org.opencontainers.image.title="Pachyderm" \
+    org.opencontainers.image.description="Automate data transformation with data versioning and lineage -- Any data, Any scale, Any Language" \
+    com.docker.desktop.extension.icon="https://raw.githubusercontent.com/pachyderm/pachyderm/master/Pachyderm_Icon-01.svg" \
     org.opencontainers.image.vendor="Pachyderm" \
     com.docker.desktop.extension.api.version=">= 0.3.0" \
     com.docker.extension.screenshots="" \
     com.docker.extension.detailed-description="" \
-    com.docker.extension.publisher-url="" \
-    com.docker.extension.additional-urls="" \
-    com.docker.extension.changelog="" \
-    com.docker.desktop.extension.icon=pachydermLogoFooter.svg
+    com.docker.extension.publisher-url="https://pachyderm.com" \
+    com.docker.extension.additional-urls='[{"title":"Website","url":"https://pachyderm.com/"},{"title":"Documentation","url":"https://docs.pachyderm.com/"},{"title":"GitHub","url":"https://github.com/pachyderm/pachyderm"},{"title":"Get Started","url":"https://docs.pachyderm.com/2.4.x/getting-started/beginner-tutorial/"},{"title":"MLOps","url":"https://www.pachyderm.com/solutions/mlops/"},{"title":"Data-Centric AI","url":"https://www.pachyderm.com/data-centric-ai/"},{"title":"Video & Image processing","url":"https://www.pachyderm.com/solutions/unstructured-data/"}]'
 
 RUN apk add curl
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/${TARGETARCH}/kubectl \
