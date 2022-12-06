@@ -2,7 +2,7 @@
 	<img src='./Pachyderm_Icon-01.svg' height='225' title='Pachyderm Docker Desktop Extension'>
 </p>
 
-# Intro
+# Intro (This is a work in progress with minimal testing so far)
 Docker desktop is supported on all platfrom -- Linux, Mac, and Windows. It also has the AMD64 and ARM64 version. This enables the ONE click deployment of Pachyderm on personal comuters.
 
 Ideal state of our getting started doc.
