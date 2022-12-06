@@ -6,31 +6,11 @@ export const CurrentExtensionContext = "currentExtensionContext";
 export const IsK8sEnabled = "isK8sEnabled";
 export const pachVersion = "2.4.1";
 
-export const updatePach = async (
-  ddClient: v1.DockerDesktopClient
+const installPach = async (
+    ddClient: v1.DockerDesktopClient,
+    helmbin: string,
 ) => {
-    let run = "run.sh";
-    let helmbin = "helm";
-    let kcbin = "kubectl";
-    var result = new String("Go to http://localhost\n\n");
-    result = result.concat("Operations logs...\n");
-    if (isWindows()) {
-        run = "run.ps1";
-        helmbin = "helm.exe";
-        kcbin = "kubectl.exe";
-    }
-    try {
-        let output = await ddClient.extension.host?.cli.exec(kcbin, [
-            "cluster-info",
-            "--request-timeout",
-            "2s",
-        ]);
-    } catch (e: any) {
-        console.log("Kubernetes not enabled");
-        return "Go to Settings -> Kubernetes -> Enable";
-    }
-    result = result.concat("[check] kubernetes...enabled\n");
-    console.log("Kubernetes enabled\n");
+    var result = new String("");
     try {
         let out = await ddClient.extension.host?.cli.exec(helmbin, [
             "uninstall",
@@ -89,6 +69,41 @@ export const updatePach = async (
     }
     result = result.concat("[install] pachyderm local deployment...done\n");
     console.log("Pachyderm installed\n");
+    return result;
+};
+
+export const updatePach = async (
+  ddClient: v1.DockerDesktopClient
+) => {
+    let run = "run.sh";
+    let helmbin = "helm";
+    let kcbin = "kubectl";
+    var result = new String("Go to http://localhost\n\n");
+    result = result.concat("Operations logs...\n");
+    if (isWindows()) {
+        run = "run.ps1";
+        helmbin = "helm.exe";
+        kcbin = "kubectl.exe";
+    }
+    try {
+        let output = await ddClient.extension.host?.cli.exec(kcbin, [
+            "cluster-info",
+            "--request-timeout",
+            "2s",
+        ]);
+    } catch (e: any) {
+        console.log("Kubernetes not enabled");
+        return "Go to Settings -> Kubernetes -> Enable";
+    }
+    result = result.concat("[check] kubernetes...enabled\n");
+    console.log("Kubernetes enabled\n");
+    try {
+       let output = await installPach(ddClient, helmbin);
+       result = result.concat(output);
+    } catch (e: any) {
+        console.error(e);
+        return e?.stderr;
+    }
     try {
         let output = await ddClient.extension.host?.cli.exec(run, [
             pachVersion,
