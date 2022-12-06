@@ -24,9 +24,34 @@ LABEL org.opencontainers.image.title="Pachyderm" \
     org.opencontainers.image.vendor="Pachyderm" \
     com.docker.desktop.extension.api.version=">= 0.3.0" \
     com.docker.extension.screenshots="" \
-    com.docker.extension.detailed-description="" \
+    com.docker.extension.detailed-description=' \
+        <p> \
+	    <h1 style="text-align: center">What is Pachyderm?</h1> \
+		<p>Pachyderm is cost-effective at scale and enables data engineering teams to automate complex pipelines with sophisticated data transformations. \
+		</p> \
+		<div style="text-align: center"> \
+		<img width="723" height="450" src="https://www.pachyderm.com/wp-content/uploads/2022/07/pachyderm-platform-0722-v02.svg" srcset="" sizes=""/> \
+		</div> \
+	    <h1 style="text-align: center">Key Benefits?</h1> \
+		<ul> \
+		    <li>Data-driven pipelines automatically trigger based on detecting data changes.</li> \
+		    <li>Immutable data lineage with data versioning of any data type.</il> \
+		    <li>Autoscaling and parallel processing built on Kubernetes for resource orchestration.</il> \
+		    <li>Uses standard object stores for data storage with automatic deduplication.</il> \
+		    <li>Runs across all major cloud providers and on-premises installations.</il> \
+		</ul> \
+	</p>' \
     com.docker.extension.publisher-url="https://pachyderm.com" \
-    com.docker.extension.additional-urls='[{"title":"Website","url":"https://pachyderm.com/"},{"title":"Documentation","url":"https://docs.pachyderm.com/"},{"title":"GitHub","url":"https://github.com/pachyderm/pachyderm"},{"title":"Get Started","url":"https://docs.pachyderm.com/2.4.x/getting-started/beginner-tutorial/"},{"title":"MLOps","url":"https://www.pachyderm.com/solutions/mlops/"},{"title":"Data-Centric AI","url":"https://www.pachyderm.com/data-centric-ai/"},{"title":"Video & Image processing","url":"https://www.pachyderm.com/solutions/unstructured-data/"}]'
+    com.docker.extension.additional-urls='[ \
+	{"title":"Get Started","url":"https://docs.pachyderm.com/2.4.x/getting-started/beginner-tutorial/"}, \
+	{"title":"Examples","url":"https://www.pachyderm.com/resources/type/examples/"}, \
+	{"title":"Video & Image processing","url":"https://www.pachyderm.com/solutions/unstructured-data/"}, \
+	{"title":"MLOps","url":"https://www.pachyderm.com/solutions/mlops/"}, \
+	{"title":"Data-Centric AI","url":"https://www.pachyderm.com/data-centric-ai/"}, \
+	{"title":"Documentation","url":"https://docs.pachyderm.com/"}, \
+	{"title":"GitHub","url":"https://github.com/pachyderm/pachyderm"}, \
+        {"title":"Website","url":"https://pachyderm.com/"} \
+	]'
 
 RUN apk add curl
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/${TARGETARCH}/kubectl \
