@@ -1,4 +1,5 @@
 import { v1 } from "@docker/extension-api-client-types";
+import { isWindows } from "./utils"
 
 export const DockerDesktop = "docker-desktop";
 export const CurrentExtensionContext = "currentExtensionContext";
@@ -13,7 +14,7 @@ export const updatePach = async (
     let kcbin = "kubectl";
     var result = new String("Go to http://localhost\n\n");
     result = result.concat("Operations logs...\n");
-    if (ddClient.host.platform === "win32") {
+    if (isWindows()) {
         run = "run.ps1";
         helmbin = "helm.exe";
         kcbin = "kubectl.exe";

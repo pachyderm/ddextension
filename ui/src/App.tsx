@@ -3,6 +3,7 @@ import Button from "@mui/material/Button";
 import { createDockerDesktopClient } from "@docker/extension-api-client";
 import { Grid, Stack, TextField, Typography } from "@mui/material";
 import { updatePach } from "./helper/pachinstaller";
+import { openBrowser } from "./helper/utils";
 
 // Note: This line relies on Docker Desktop's presence as a host application.
 // If you're running this React app in a browser, it won't work properly.
@@ -33,7 +34,17 @@ export function App() {
                 setResponse(pachResult);
               }}
             >
-              Install Pachyderm
+              Install
+            </Button>
+          </Stack>
+          <Stack direction="row" alignItems="start" spacing={2} sx={{ mt: 4 }}>
+            <Button
+              variant="contained"
+              onClick={async () => {
+                await openBrowser(ddClient, "http://localhost");
+              }}
+            >
+              Console
             </Button>
           </Stack>
         </Grid>
