@@ -117,3 +117,26 @@ export const updatePach = async (
     console.log(result);
     return result;
 };
+
+
+export const runImageProcessing = async (
+  ddClient: v1.DockerDesktopClient
+) => {
+    let run = "runexample.sh";
+    var result = new String("Go to http://localhost\n\n");
+    result = result.concat("Operations logs...\n");
+    if (isWindows()) {
+        run = "runexample.ps1";
+    }
+    try {
+        let output = await ddClient.extension.host?.cli.exec(run, [
+            "imageprocessing.sh",
+        ]);
+    } catch (e: any) {
+        console.error(e);
+        return e?.stderr;
+    }
+    result = result.concat("[install] pachctl...done\n");
+    console.log("Pachctl installed and context set to local\n");
+    console.log(result);
+};

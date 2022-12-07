@@ -59,6 +59,23 @@
             "path": "/windows/run.ps1"
           }
         ]
+      },
+      {
+        "linux": [
+          {
+            "path": "/linux/runexample.sh"
+          }
+        ],
+        "darwin": [
+          {
+            "path": "/darwin/runexample.sh"
+          }
+        ],
+        "windows": [
+          {
+            "path": "/windows/runexample.ps1"
+          }
+        ]
       }
     ]
   }

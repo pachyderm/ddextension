@@ -2,7 +2,7 @@ import React from "react";
 import Button from "@mui/material/Button";
 import { createDockerDesktopClient } from "@docker/extension-api-client";
 import { Grid, Stack, TextField, Typography } from "@mui/material";
-import { updatePach } from "./helper/pachinstaller";
+import { updatePach, runImageProcessing } from "./helper/pachinstaller";
 import { openBrowser } from "./helper/utils";
 
 // Note: This line relies on Docker Desktop's presence as a host application.
@@ -45,6 +45,18 @@ export function App() {
               }}
             >
               Console
+            </Button>
+          </Stack>
+          <Stack direction="row" alignItems="start" spacing={2} sx={{ mt: 4 }}>
+            <Button
+              variant="contained"
+              onClick={async () => {
+                await openBrowser(ddClient, "http://localhost/lineage/default");
+		const runResult = await runImageProcessing(ddClient);
+		setResponse(runResult);
+              }}
+            >
+              Image Processing
             </Button>
           </Stack>
         </Grid>

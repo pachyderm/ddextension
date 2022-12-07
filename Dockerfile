@@ -86,6 +86,9 @@ RUN if [ "${TARGETARCH}" = "amd64" ]; then \
 COPY --chmod=0755 script/run.sh /darwin/run.sh
 COPY --chmod=0755 script/run.sh /linux/run.sh
 COPY --chmod=0755 script/run.ps1 /windows/run.ps1
+COPY --chmod=0755 script/runexample.sh /darwin/runexample.sh
+COPY --chmod=0755 script/runexample.sh /linux/runexample.sh
+COPY --chmod=0755 script/runexample.ps1 /windows/runexample.ps1
 
 COPY metadata.json .
 COPY pachydermLogoFooter.svg .
