@@ -17,18 +17,39 @@ cleanLocal() {
 }
 
 runOpenCV() {
+    downloadLocal
     if [[ -z "$(pachctl list repo | cut -f 1 -d ' ' | grep -w images)" ]]; then
-        downloadLocal
         pachctl create repo images
-        pachctl create pipeline -f edges.json
-        pachctl create pipeline -f montage.json
-        pachctl put file images@master -i images.txt
-        pachctl put file images@master -i images2.txt
-        cleanLocal
-        echo "Started image processing example"
+	echo "[Create] Images repo"
     else
-        echo "Image processing already running"
+	echo "[Skip] Images repo exists"
     fi
+    if [[ -z "$(pachctl list repo | cut -f 1 -d ' ' | grep -w edges)" ]]; then
+        pachctl create pipeline -f edges.json
+	echo "[Create] Edges pipeline and repo"
+    else
+	echo "[Skip] Edges pipeline and repo exists"
+    fi
+    if [[ -z "$(pachctl list repo | cut -f 1 -d ' ' | grep -w montage)" ]]; then
+        pachctl create pipeline -f montage.json
+	echo "[Create] Montage pipeline and repo"
+    else
+	echo "[Skip] Montage pipeline and repo exists"
+    fi
+    if [[ -z "$(pachctl list file images@master | grep -w `cat images.txt | cut -d '/' -f 4 | head -1`)" ]]; then
+        pachctl put file images@master -i images.txt
+	echo "[Add] Add one file to images repo"
+    else
+	echo "[Skip] File already exists in images repo"
+    fi
+    if [[ -z "$(pachctl list file images@master | grep -w `cat images2.txt | cut -d '/' -f 4 | head -1`)" ]]; then
+        pachctl put file images@master -i images2.txt
+	echo "[Add] Add two more file to images repo"
+    else
+	echo "[Skip] File already exists in images repo"
+    fi
+    echo "Started image processing example"
+    cleanLocal
 }
 
 runOpenCV

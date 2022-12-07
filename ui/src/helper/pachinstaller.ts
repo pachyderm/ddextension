@@ -123,8 +123,7 @@ export const runImageProcessing = async (
   ddClient: v1.DockerDesktopClient
 ) => {
     let run = "runexample.sh";
-    var result = new String("Go to http://localhost\n\n");
-    result = result.concat("Operations logs...\n");
+    var result = new String("Navigate to the default project in Console to see image processing\n\n");
     if (isWindows()) {
         run = "runexample.ps1";
     }
@@ -136,7 +135,7 @@ export const runImageProcessing = async (
         console.error(e);
         return e?.stderr;
     }
-    result = result.concat("[install] pachctl...done\n");
-    console.log("Pachctl installed and context set to local\n");
+    console.log("Image processing example started\n");
     console.log(result);
+    return result;
 };
