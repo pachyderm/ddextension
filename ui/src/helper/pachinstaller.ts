@@ -135,6 +135,13 @@ export const runImageProcessing = async (
         console.error(e);
         return e?.stderr;
     }
+    result = result.concat("CLI steps to do image processing in Pachyderm...\n");
+    result = result.concat("\t1. pachctl create repo images\n");
+    result = result.concat("\t2. pachctl create pipeline -f edges.json\n");
+    result = result.concat("\t3. pachctl create pipeline -f montage.json\n");
+    result = result.concat("\t4. pachctl put file images@master -i images.txt\n");
+    result = result.concat("\t5. pachctl put file images@master -i images2.txt\n");
+    result = result.concat("\nAll files on GitHub: https://github.com/pachyderm/pachyderm/master/examples/opencv\n");
     console.log("Image processing example started\n");
     console.log(result);
     return result;

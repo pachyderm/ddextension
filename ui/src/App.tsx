@@ -51,6 +51,7 @@ export function App() {
             <Button
               variant="contained"
               onClick={async () => {
+                setResponse("Starting image processing...");
                 await openBrowser(ddClient, "http://localhost/lineage/default");
 		const runResult = await runImageProcessing(ddClient);
 		setResponse(runResult);
