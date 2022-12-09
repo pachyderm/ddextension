@@ -1,0 +1,79 @@
+singleuser:
+  cloudMetadata:
+    blockWithIptables: false
+  defaultUrl: "/lab"
+  image:
+    name: pachyderm/notebooks-user
+    tag: v2.4.2
+  extraEnv:
+    "SIDECAR_MODE": "True"
+  extraContainers:
+    - name: mount-server-manager
+      image: pachyderm/mount-server:2.4.2
+      command: ["/bin/bash"]
+      args:
+        [
+          "-c",
+          "mkdir -p ~/.pachyderm && cp /config/config.json ~/.pachyderm && mount-server",
+        ]
+      volumeMounts:
+        - name: shared-pfs
+          mountPath: /pfs
+          mountPropagation: Bidirectional
+        - name: files
+          mountPath: /config
+      securityContext:
+        privileged: true
+        runAsUser: 0
+  storage:
+    extraVolumeMounts:
+      - name: shared-pfs
+        mountPath: /pfs
+        mountPropagation: HostToContainer
+    extraVolumes:
+      - name: shared-pfs
+        emptyDir: {}
+  extraFiles:
+    config.json:
+      mountPath: /config/config.json
+      data:
+        v2:
+          active_context: mount-server
+          contexts:
+            mount-server:
+              source: 2
+              pachd_address: grpc://pachd-peer:30653
+          metrics: true
+    pach-login:
+      mountPath: /bin/pach-login
+      stringData: |
+        #!/usr/bin/env bash
+
+        if [[ ! -f ${HOME}/.pachyderm/config.json ]]
+        then
+            mkdir -p ${HOME}/.pachyderm
+            cp /config/config.json ${HOME}/.pachyderm/config.json
+            chown ${NB_UID}:${NB_GID} ${HOME}/.pachyderm/config.json
+        fi
+      mode: 0555
+  lifecycleHooks:
+    postStart:
+      exec:
+        command:
+          - /bin/bash
+          - -c
+          - "/bin/pach-login"
+scheduling:
+  userScheduler:
+    enabled: false
+prePuller:
+  hook:
+    enabled: false
+proxy:
+  service:
+    type: LoadBalancer
+    disableHttpPort: true
+    extraPorts:
+      - name: http
+        port: 8080
+        targetPort: http
