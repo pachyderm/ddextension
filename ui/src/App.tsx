@@ -23,21 +23,19 @@ export function App() {
       <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
         Docker desktop extension for Pachyderm
       </Typography>
-      <Grid container spacing={2}>
+      <Grid container spacing={4}>
         <Grid item>
           <Stack direction="row" alignItems="start" spacing={2} sx={{ mt: 4 }}>
             <Button
               variant="contained"
               onClick={async () => {
-                setResponse("installing... waiting for the URL");
+                setResponse("installing...");
                 const pachResult = await updatePach(ddClient);
                 setResponse(pachResult);
               }}
             >
               Install
             </Button>
-          </Stack>
-          <Stack direction="row" alignItems="start" spacing={2} sx={{ mt: 4 }}>
             <Button
               variant="contained"
               onClick={async () => {
@@ -46,15 +44,21 @@ export function App() {
             >
               Console
             </Button>
-          </Stack>
-          <Stack direction="row" alignItems="start" spacing={2} sx={{ mt: 4 }}>
+            <Button
+              variant="contained"
+              onClick={async () => {
+                await openBrowser(ddClient, "http://localhost:8080");
+              }}
+            >
+              Notebook
+            </Button>
             <Button
               variant="contained"
               onClick={async () => {
                 setResponse("Starting image processing...");
                 await openBrowser(ddClient, "http://localhost/lineage/default");
-		const runResult = await runImageProcessing(ddClient);
-		setResponse(runResult);
+		        const runResult = await runImageProcessing(ddClient);
+		        setResponse(runResult);
               }}
             >
               Image Processing

@@ -72,13 +72,90 @@ const installPach = async (
     return result;
 };
 
+const installJupyter = async (
+    ddClient: v1.DockerDesktopClient,
+    helmbin: string,
+) => {
+    var result = new String("");
+    try {
+        let out = await ddClient.extension.host?.cli.exec(helmbin, [
+            "uninstall",
+            "jupyter",
+        ]);
+    } catch (e: any) {
+        if (e.stderr !== "Error: uninstall: Release not loaded: jupyter: release: not found\n") {
+            console.error(e);
+            return e?.stderr;
+        }
+    }
+    result = result.concat("[uninstall] jupyter...done\n");
+    console.log("Jupyter install clean\n");
+    try {
+        let out = await ddClient.extension.host?.cli.exec(helmbin, [
+            "uninstall",
+            "jupyterhub",
+        ]);
+    } catch (e: any) {
+        if (e.stderr !== "Error: uninstall: Release not loaded: jupyterhub: release: not found\n") {
+            console.error(e);
+            return e?.stderr;
+        }
+    }
+    result = result.concat("[uninstall] jupyterhub...done\n");
+    console.log("JupyterHub install clean\n");
+    try {
+        let out = await ddClient.extension.host?.cli.exec(helmbin, [
+            "repo",
+            "add",
+            "jupyterhub",
+            "https://jupyterhub.github.io/helm-chart/",
+        ]);
+    } catch (e: any) {
+        if (e.stderr !== "Error: repository name (juypterhub) already exists, please specify a different name\n") {
+            console.error(e);
+            return e?.stderr;
+        }
+    }
+    result = result.concat("[add] juypterhub helm repo...done\n");
+    console.log("Helm add repo (juypterhub)\n");
+    try {
+        let out = await ddClient.extension.host?.cli.exec(helmbin, [
+            "repo",
+            "update",
+            "jupyterhub",
+        ]);
+    } catch (e: any) {
+        console.error(e);
+        return e?.stderr;
+    }
+    result = result.concat("[update] jupyterhub helm repo...done\n");
+    console.log("Helm update repo (jupyterhub)\n");
+    try {
+        let out = await ddClient.extension.host?.cli.exec(helmbin, [
+            "upgrade",
+            "--cleanup-on-fail",
+            "--install",
+            "--version 2.0.0",
+            "jupyter",
+            "jupyterhub/jupyterhub",
+            "-f https://raw.githubusercontent.com/pachyderm/ddextension/main/script/jupyter.yaml",
+        ]);
+    } catch (e: any) {
+        console.error(e);
+        return e?.stderr;
+    }
+    result = result.concat("[install] notebook deployment...done\n");
+    console.log("Notebook installed\n");
+    return result;
+};
+
 export const updatePach = async (
   ddClient: v1.DockerDesktopClient
 ) => {
     let run = "run.sh";
     let helmbin = "helm";
     let kcbin = "kubectl";
-    var result = new String("Go to http://localhost\n\n");
+    var result = new String("Explore Pachyderm via Console or Notebook\n\n");
     result = result.concat("Operations logs...\n");
     if (isWindows()) {
         run = "run.ps1";
@@ -113,11 +190,17 @@ export const updatePach = async (
         return e?.stderr;
     }
     result = result.concat("[install] pachctl...done\n");
-    console.log("Pachctl installed and context set to local\n");
+    try {
+       let output = await installJupyter(ddClient, helmbin);
+       result = result.concat(output);
+    } catch (e: any) {
+        console.error(e);
+        return e?.stderr;
+    }
+    console.log("Pachyder + Pachctl + Console + Notebook installed\n");
     console.log(result);
     return result;
 };
-
 
 export const runImageProcessing = async (
   ddClient: v1.DockerDesktopClient

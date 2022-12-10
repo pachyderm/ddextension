@@ -24,6 +24,7 @@ LABEL org.opencontainers.image.title="Pachyderm" \
     org.opencontainers.image.vendor="Pachyderm" \
     com.docker.desktop.extension.api.version=">= 0.3.0" \
     com.docker.extension.screenshots="" \
+    com.docker.extension.categories="kubernetes, data-science, data-engineering, data-transformation" \
     com.docker.extension.detailed-description=' \
         <p> \
 	    <h1 style="text-align: center">What is Pachyderm?</h1> \
