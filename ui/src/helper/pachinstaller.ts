@@ -4,11 +4,11 @@ import { isWindows } from "./utils"
 export const DockerDesktop = "docker-desktop";
 export const CurrentExtensionContext = "currentExtensionContext";
 export const IsK8sEnabled = "isK8sEnabled";
-export const pachVersion = "2.4.1";
 
 const installPach = async (
     ddClient: v1.DockerDesktopClient,
     helmbin: string,
+    pachver: string,
 ) => {
     var result = new String("");
     try {
@@ -57,7 +57,7 @@ const installPach = async (
             "pachd",
             "pach/pachyderm",
             "--version",
-            pachVersion,
+            pachver,
             "--set deployTarget=LOCAL",
             "--set proxy.enabled=true",
             "--set proxy.service.type=LoadBalancer",
@@ -75,6 +75,7 @@ const installPach = async (
 const installJupyter = async (
     ddClient: v1.DockerDesktopClient,
     helmbin: string,
+    pachver: string,
 ) => {
     var result = new String("");
     try {
@@ -130,6 +131,8 @@ const installJupyter = async (
     }
     result = result.concat("[update] jupyterhub helm repo...done\n");
     console.log("Helm update repo (jupyterhub)\n");
+    /* TODO: need a robust way to specify extraContainers[0] -- we should not be using [0]
+     */
     try {
         let out = await ddClient.extension.host?.cli.exec(helmbin, [
             "upgrade",
@@ -139,6 +142,8 @@ const installJupyter = async (
             "jupyter",
             "jupyterhub/jupyterhub",
             "-f https://raw.githubusercontent.com/pachyderm/ddextension/main/script/jupyter.yaml",
+            ''.concat('--set singleuser.image.tag=v',pachver),
+            ''.concat('--set singleuser.extraContainers[0].image=pachyderm/mount-server:',pachver),
         ]);
     } catch (e: any) {
         console.error(e);
@@ -150,13 +155,21 @@ const installJupyter = async (
 };
 
 export const updatePach = async (
-  ddClient: v1.DockerDesktopClient
+  ddClient: v1.DockerDesktopClient,
+  installVer: string,
 ) => {
     let run = "run.sh";
     let helmbin = "helm";
     let kcbin = "kubectl";
     var result = new String("Explore Pachyderm via Console or Notebook\n\n");
     result = result.concat("Operations logs...\n");
+    /* TODO: There is likely a way to pass default parameter for installVer
+     */
+    var pachver = installVer;
+    if (installVer === "") {
+	pachver = "2.4.1";
+    }
+    console.log(pachver);
     if (isWindows()) {
         run = "run.ps1";
         helmbin = "helm.exe";
@@ -175,7 +188,7 @@ export const updatePach = async (
     result = result.concat("[check] kubernetes...enabled\n");
     console.log("Kubernetes enabled\n");
     try {
-       let output = await installPach(ddClient, helmbin);
+       let output = await installPach(ddClient, helmbin, pachver);
        result = result.concat(output);
     } catch (e: any) {
         console.error(e);
@@ -183,7 +196,7 @@ export const updatePach = async (
     }
     try {
         let output = await ddClient.extension.host?.cli.exec(run, [
-            pachVersion,
+            pachver,
         ]);
     } catch (e: any) {
         console.error(e);
@@ -191,7 +204,7 @@ export const updatePach = async (
     }
     result = result.concat("[install] pachctl...done\n");
     try {
-       let output = await installJupyter(ddClient, helmbin);
+       let output = await installJupyter(ddClient, helmbin, pachver);
        result = result.concat(output);
     } catch (e: any) {
         console.error(e);

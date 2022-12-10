@@ -26,11 +26,13 @@ export function App() {
       <Grid container spacing={4}>
         <Grid item>
           <Stack direction="row" alignItems="start" spacing={2} sx={{ mt: 4 }}>
+            <input type="text" id="version"/>
             <Button
               variant="contained"
               onClick={async () => {
-                setResponse("installing...");
-                const pachResult = await updatePach(ddClient);
+                let ver = ((document.getElementById("version") as HTMLInputElement).value);
+                setResponse(''.concat('Installing version', ' ', ver, '...'));
+                const pachResult = await updatePach(ddClient, ver);
                 setResponse(pachResult);
               }}
             >
@@ -48,6 +50,7 @@ export function App() {
               variant="contained"
               onClick={async () => {
                 await openBrowser(ddClient, "http://localhost:8080");
+                setResponse("If prompted to login -- username: 'admin', password: ''\n");
               }}
             >
               Notebook
