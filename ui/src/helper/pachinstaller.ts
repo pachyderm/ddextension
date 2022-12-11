@@ -10,20 +10,7 @@ const installPach = async (
     helmbin: string,
     pachver: string,
 ) => {
-    var result = new String("");
-    try {
-        let out = await ddClient.extension.host?.cli.exec(helmbin, [
-            "uninstall",
-            "pachd",
-        ]);
-    } catch (e: any) {
-        if (e.stderr !== "Error: uninstall: Release not loaded: pachd: release: not found\n") {
-            console.error(e);
-            return e?.stderr;
-        }
-    }
-    result = result.concat("[uninstall] pachyderm...done\n");
-    console.log("Pach install clean\n");
+    var result: string = '';
     try {
         let out = await ddClient.extension.host?.cli.exec(helmbin, [
             "repo",
@@ -34,7 +21,7 @@ const installPach = async (
     } catch (e: any) {
         if (e.stderr !== "Error: repository name (pach) already exists, please specify a different name\n") {
             console.error(e);
-            return e?.stderr;
+            return [false, e?.stderr];
         }
     }
     result = result.concat("[add] pachyderm helm repo...done\n");
@@ -47,10 +34,42 @@ const installPach = async (
         ]);
     } catch (e: any) {
         console.error(e);
-        return e?.stderr;
+        return [false, e?.stderr];
     }
     result = result.concat("[update] pachyderm helm repo...done\n");
     console.log("Helm update repo (pach)\n");
+    try {
+        let out = await ddClient.extension.host?.cli.exec(helmbin, [
+            "search",
+            "repo",
+            "pach/pachyderm",
+            "--version",
+            pachver,
+        ]);
+        if (out?.stdout === "No results found\n") {
+            result = result.concat("[check] Did not find helm chart for ", pachver);
+            console.log("Helm version not found\n");
+            return [false, result];
+        }
+    } catch (e: any) {
+        console.error(e);
+        return [false, e?.stderr];
+    }
+    result = result.concat("[check] pachyderm helm chart...done\n");
+    console.log("Pachyderm helm chart exists\n");
+    try {
+        let out = await ddClient.extension.host?.cli.exec(helmbin, [
+            "uninstall",
+            "pachd",
+        ]);
+    } catch (e: any) {
+        if (e.stderr !== "Error: uninstall: Release not loaded: pachd: release: not found\n") {
+            console.error(e);
+            return [false, e?.stderr];
+        }
+    }
+    result = result.concat("[uninstall] pachyderm...done\n");
+    console.log("Pach install clean\n");
     try {
         let out = await ddClient.extension.host?.cli.exec(helmbin, [
             "install",
@@ -65,11 +84,11 @@ const installPach = async (
         ]);
     } catch (e: any) {
         console.error(e);
-        return e?.stderr;
+        return [false, e?.stderr];
     }
     result = result.concat("[install] pachyderm local deployment...done\n");
     console.log("Pachyderm installed\n");
-    return result;
+    return [true, result];
 };
 
 const installJupyter = async (
@@ -77,7 +96,7 @@ const installJupyter = async (
     helmbin: string,
     pachver: string,
 ) => {
-    var result = new String("");
+    var result: string = '';
     try {
         let out = await ddClient.extension.host?.cli.exec(helmbin, [
             "uninstall",
@@ -86,7 +105,7 @@ const installJupyter = async (
     } catch (e: any) {
         if (e.stderr !== "Error: uninstall: Release not loaded: jupyter: release: not found\n") {
             console.error(e);
-            return e?.stderr;
+            return [false, e?.stderr];
         }
     }
     result = result.concat("[uninstall] jupyter...done\n");
@@ -99,7 +118,7 @@ const installJupyter = async (
     } catch (e: any) {
         if (e.stderr !== "Error: uninstall: Release not loaded: jupyterhub: release: not found\n") {
             console.error(e);
-            return e?.stderr;
+            return [false, e?.stderr];
         }
     }
     result = result.concat("[uninstall] jupyterhub...done\n");
@@ -114,7 +133,7 @@ const installJupyter = async (
     } catch (e: any) {
         if (e.stderr !== "Error: repository name (juypterhub) already exists, please specify a different name\n") {
             console.error(e);
-            return e?.stderr;
+            return [false, e?.stderr];
         }
     }
     result = result.concat("[add] juypterhub helm repo...done\n");
@@ -127,7 +146,7 @@ const installJupyter = async (
         ]);
     } catch (e: any) {
         console.error(e);
-        return e?.stderr;
+        return [false, e?.stderr];
     }
     result = result.concat("[update] jupyterhub helm repo...done\n");
     console.log("Helm update repo (jupyterhub)\n");
@@ -147,11 +166,11 @@ const installJupyter = async (
         ]);
     } catch (e: any) {
         console.error(e);
-        return e?.stderr;
+        return [false, e?.stderr];
     }
     result = result.concat("[install] notebook deployment...done\n");
     console.log("Notebook installed\n");
-    return result;
+    return [true, result];
 };
 
 export const updatePach = async (
@@ -161,7 +180,7 @@ export const updatePach = async (
     let run = "run.sh";
     let helmbin = "helm";
     let kcbin = "kubectl";
-    var result = new String("Explore Pachyderm via Console or Notebook\n\n");
+    var result: string = "Explore Pachyderm via Console or Notebook\n\n";
     result = result.concat("Operations logs...\n");
     /* TODO: There is likely a way to pass default parameter for installVer
      */
@@ -175,6 +194,9 @@ export const updatePach = async (
         helmbin = "helm.exe";
         kcbin = "kubectl.exe";
     }
+
+    /* Check if k8s is enabled
+     */
     try {
         let output = await ddClient.extension.host?.cli.exec(kcbin, [
             "cluster-info",
@@ -187,13 +209,22 @@ export const updatePach = async (
     }
     result = result.concat("[check] kubernetes...enabled\n");
     console.log("Kubernetes enabled\n");
-    try {
-       let output = await installPach(ddClient, helmbin, pachver);
-       result = result.concat(output);
-    } catch (e: any) {
-        console.error(e);
-        return e?.stderr;
+
+    /* Install Pachyderm
+     */
+    {
+        let [done, output] = await installPach(ddClient, helmbin, pachver);
+        result = result.concat(output);
+        console.log(result);
+        if (done === false) {
+            console.log("[install] pachyerm... failed\n");
+            result = result.concat("[install] pachyderm...failed\n");
+            return result;
+        }
     }
+
+    /* Run script to install binary on the host. Pachctl
+     */
     try {
         let output = await ddClient.extension.host?.cli.exec(run, [
             pachver,
@@ -203,15 +234,21 @@ export const updatePach = async (
         return e?.stderr;
     }
     result = result.concat("[install] pachctl...done\n");
-    try {
-       let output = await installJupyter(ddClient, helmbin, pachver);
-       result = result.concat(output);
-    } catch (e: any) {
-        console.error(e);
-        return e?.stderr;
+
+    /* Install notebook, with pach extension
+     */
+    {
+        let [done, output] = await installJupyter(ddClient, helmbin, pachver);
+        result = result.concat(output);
+        console.log(result);
+        if (done === false) {
+            console.log("[install] Notebook... failed\n");
+            result = result.concat("[install] Notebook...failed\n");
+            return result;
+        }
     }
+
     console.log("Pachyder + Pachctl + Console + Notebook installed\n");
-    console.log(result);
     return result;
 };
 
@@ -219,7 +256,7 @@ export const runImageProcessing = async (
   ddClient: v1.DockerDesktopClient
 ) => {
     let run = "runexample.sh";
-    var result = new String("Navigate to the default project in Console to see image processing\n\n");
+    var result: string = "Navigate to the default project in Console to see image processing\n\n";
     if (isWindows()) {
         run = "runexample.ps1";
     }
