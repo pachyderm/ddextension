@@ -56,6 +56,7 @@ installPachctl() {
         echo "installed"
     else
         if [[ $(command -v pachctl) == "" ]] ; then
+            brew tap pachyderm/tap > /dev/null 2>&1
             brew install pachctl@${PACHCTL_MAJOR_MINOR} > /dev/null 2>&1
             echo "installed"
         else
@@ -63,6 +64,7 @@ installPachctl() {
                [ "${PACHCTL_MAJOR_MINOR}" == "$(pachctl version --client-only | cut -d '.' -f -2)" ]; then
                 brew upgrade pachctl@${PACHCTL_MAJOR_MINOR} > /dev/null 2>&1
             else
+                brew tap pachyderm/tap > /dev/null 2>&1
                 brew install pachctl@${PACHCTL_MAJOR_MINOR} > /dev/null 2>&1
             fi
             brew unlink pachctl@${PACHCTL_MAJOR_MINOR} > /dev/null 2>&1
