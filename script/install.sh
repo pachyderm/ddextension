@@ -36,12 +36,14 @@ copyPachctl() {
         abort "Cannot find ${MACH} for ${ARCH}"
     fi
 
-    if [[ "$(cp -f pachctl_dir/pachctl /usr/local/bin/pachctl)" -ne 0 ]]; then
+    CPY=$(cp -f pachctl_dir/pachctl /usr/local/bin/pachctl 2>&1)
+    if [[ ! -z ${CPY} ]]; then
         IFS=: read -r -d '' -a path_array < <(printf '%s:\0' "${PATH}")
         set -o noglob
         for p in "${path_array[@]}"; do
             P_PATH="$p/pachctl"
-            if [[ "$(cp -f pachctl_dir/pachctl ${P_PATH})" -eq 0 ]]; then
+            CPY=$(cp -f pachctl_dir/pachctl ${P_PATH} 2>&1)
+            if [[ -z ${CPY} ]]; then
                 break
             fi
         done
