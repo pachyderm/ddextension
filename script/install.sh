@@ -55,25 +55,24 @@ installPachctl() {
     echo -n "Pachctl..."
     if [[ $(command -v brew) == "" ]] ; then
         copyPachctl
-        echo "installed"
+        echo "force installed"
     else
+        brew tap pachyderm/tap > /dev/null 2>&1
         if [[ $(command -v pachctl) == "" ]] ; then
-            brew tap pachyderm/tap > /dev/null 2>&1
             brew install pachctl@${PACHCTL_MAJOR_MINOR} > /dev/null 2>&1
-            echo "installed"
+            echo "brew installed"
         else
-            if [ -L "$(command -v pachctl)" ] &&
-               [ "${PACHCTL_MAJOR_MINOR}" == "$(pachctl version --client-only | cut -d '.' -f -2)" ]; then
+            if [[ "${PACHCTL_MAJOR_MINOR}" == "$(pachctl version --client-only | cut -d '.' -f -2)" ]]; then
                 brew upgrade pachctl@${PACHCTL_MAJOR_MINOR} > /dev/null 2>&1
             else
-                brew tap pachyderm/tap > /dev/null 2>&1
                 brew install pachctl@${PACHCTL_MAJOR_MINOR} > /dev/null 2>&1
             fi
             brew unlink pachctl@${PACHCTL_MAJOR_MINOR} > /dev/null 2>&1
             brew link --overwrite pachctl@${PACHCTL_MAJOR_MINOR} > /dev/null 2>&1
-            echo "upgraded"
+            echo "brew upgraded"
         fi
     fi
+    sleep 5 # Sometimes check for pachctl fails right after brew install, so wait
     if [[ $(command -v pachctl) == "" ]] ; then
         abort "Pachctl not installed. Try installing \`pachctl\` manually"
     fi
