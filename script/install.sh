@@ -53,12 +53,12 @@ copyPachctl() {
 
 installPachctl() {
     echo -n "Pachctl..."
-    if [[ $(command -v brew) == "" ]] ; then
+    if [[ $(which brew) == "" ]] ; then
         copyPachctl
         echo "force installed"
     else
         brew tap pachyderm/tap > /dev/null 2>&1
-        if [[ $(command -v pachctl) == "" ]] ; then
+        if [[ $(which pachctl) == "" ]] ; then
             brew install pachctl@${PACHCTL_MAJOR_MINOR} > /dev/null 2>&1
             echo "brew installed"
         else
@@ -73,7 +73,7 @@ installPachctl() {
         fi
     fi
     sleep 5 # Sometimes check for pachctl fails right after brew install, so wait
-    if [[ $(command -v pachctl) == "" ]] ; then
+    if [[ $(which pachctl) == "" ]] ; then
         abort "Pachctl not installed. Try installing \`pachctl\` manually"
     fi
 }
