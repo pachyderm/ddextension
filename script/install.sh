@@ -1,14 +1,8 @@
-#!/bin/bash
+#!/bin/bash --login
 
 set -u
 PACHCTL_VER="$1"
 PACHCTL_MAJOR_MINOR=$(echo "${PACHCTL_VER}" | cut -f -2 -d ".")
-
-if [[ -f "${HOME}/.bash_profile" ]]; then
-    source ${HOME}/.bash_profile > /dev/null 2>&1
-elif [[ -f "${HOME}/.bashrc" ]]; then
-    source ${HOME}/.bashrc > /dev/null 2>&1
-fi
 
 abort() {
   printf "%s\n" "$@" >&2
