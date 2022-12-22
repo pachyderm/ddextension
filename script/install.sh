@@ -85,7 +85,7 @@ waitForPachdReady() {
     startTime=$(date +%S)
     i=1
     sp="/-\|"
-    while [[ $((pachctl version --client-only | grep pachd) 2>/dev/null) != "pachd"* ]]; do
+    while [[ $((pachctl version | grep pachd) 2>/dev/null) != "pachd"* ]]; do
         printf "\b${sp:i++%${#sp}:1}"
         sleep 1
         currTime=$(date +%S)
