@@ -80,16 +80,21 @@ installPachctl() {
 
 waitForPachdReady() {
     PACH_TIMEOUT=200
+    echo -n "Pachyderm run time..."
     pachctl config set active-context local
     startTime=$(date +%S)
-    while [[ $(pachctl version | grep pachd) != "pachd"* ]] ; do
-       sleep 1
-       currTime=$(date +%S)
-       if [[ $((10#$currTime-$startTime)) -gt 10#${PACH_TIMEOUT} ]] ; then
-           abort "Abort waiting for pachd for more than ${PACH_TIMEOUT} seconds"
-       fi
+    i=1
+    sp="/-\|"
+    while [[ $((pachctl version --client-only | grep pachd) 2>/dev/null) != "pachd"* ]]; do
+        printf "\b${sp:i++%${#sp}:1}"
+        sleep 1
+        currTime=$(date +%S)
+        if [[ $((10#$currTime-$startTime)) -gt 10#${PACH_TIMEOUT} ]] ; then
+            printf "\b.abort\n"
+            abort "Abort waiting for pachd for more than ${PACH_TIMEOUT} seconds"
+        fi
     done
-    echo "Pachyderm ready!!"
+    printf "\b.ready!!\n"
 }
 
 installPachctl
